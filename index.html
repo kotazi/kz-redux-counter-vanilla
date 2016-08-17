@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>KZ Redux basic sample</title>
+    <script src="https://npmcdn.com/redux@latest/dist/redux.min.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <div>
+      <p>
+        Clicked: <span id="value">0</span>
+        <button id="increment" type="button" name="button">+</button>
+        <button id="decrement" type="button" name="button">-</button>
+        <button id="incrementIfOdd" type="button" name="button">Increment if odd</button>
+        <button id="incrementAsync" type="button" name="button">Increment async</button>
+      </p>
+    </div>
+    <script type="text/javascript">
+
+      /**
+       * Reducer
+       * Actionに呼応してアプリケーションの状態(state)をどう変化させるかを指定する。
+       * 受け取ったアクションの`type`を見て対応するアクションを実行する.
+       * 本来はObject.assignなどを用いてstateを変更せずに新しいstateを返す
+       * ちなみにReducerは複数作ることができる
+       */
+      function counter(state, action) {
+        if (typeof state=== 'undefined') {
+          return 0;
+        }
+
+        switch (action.type) {
+          case 'INCREMENT':
+            return state + 1;
+          case 'DECREMENT':
+            return state - 1;
+          default:
+            return state;
+        }
+      }
+
+      /**
+       * Redux.createStoreを用いてStoreを生成する。
+       * cteateStore(reducer, initialState(optional))
+       * Storeはアプリケーションの状態(state)を保持する。
+       * http://redux.js.org/docs/api/Store.html
+       *
+       * Store Methods
+       * getState(): stateへのアクセスを許可する
+       * dispatch(action): stateの変更をトリガする
+       * subscribe(listener): リスナを追加する。これはdispatchのタイミングで呼ばれる
+       */
+      var store = Redux.createStore(counter);
+
+      function render() {
+        var valueEl = document.getElementById('value');
+        // 最新のstateを取得して描画する
+        valueEl.innerHTML = store.getState().toString();
+      }
+      render();
+      // これでstoreのdispatch後にrenderメソッドが呼ばれるようになる
+      store.subscribe(render);
+
+      /**
+       * Action
+       * アクション名と状態の値を持った単なるオブジェクト
+       */
+      var actionIncrement = { type: 'INCREMENT' };
+      var actionDecrement = { type: 'DECREMENT' };
+
+      document.getElementById('increment').addEventListener('click', function() {
+        store.dispatch(actionIncrement);
+      });
+
+      document.getElementById('decrement').addEventListener('click', function() {
+        store.dispatch(actionDecrement);
+      });
+
+      document.getElementById('incrementIfOdd').addEventListener('click', function() {
+        if (store.getState() % 2 !== 0) {
+          store.dispatch(actionIncrement);
+        }
+      });
+
+      document.getElementById('incrementAsync').addEventListener('click', function() {
+        setTimeout(function() {
+          store.dispatch(actionIncrement);
+        }, 1000);
+      });
+
+    </script>
+  </body>
+</html>
